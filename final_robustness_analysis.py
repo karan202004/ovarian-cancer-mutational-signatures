@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import warnings
 
@@ -11,9 +10,6 @@ from lifelines.statistics import proportional_hazard_test
 
 warnings.filterwarnings("ignore", category=FutureWarning)
 
-# ============================================================
-# 1. PATHS AND SETTINGS
-# ============================================================
 
 PROJECT = Path(__file__).resolve().parent.parent
 RESULTS = PROJECT / "results"
@@ -29,10 +25,6 @@ SURV_FILE = (
 )
 
 COUNTS_FILE = RESULTS / "sbs96_counts_by_sample_cosmic_order.csv"
-
-# ============================================================
-# 2. HELPER FUNCTIONS
-# ============================================================
 
 def find_column(df, candidates):
     """Find a column without depending on capitalization."""
@@ -107,9 +99,7 @@ def fit_cox(data, predictors, label):
         return [], d, None
 
 
-# ============================================================
-# 3. LOAD SURVIVAL DATA
-# ============================================================
+#Load survival data
 
 print("\n" + "=" * 65)
 print("OVARIAN CANCER: FINAL ROBUSTNESS ANALYSIS")
@@ -160,9 +150,7 @@ print(f"Median SBS3: {surv['SBS3_MAIN_PERCENT'].median():.2f}%")
 
 surv.to_csv(OUT / "analysis_cohort.csv", index=False)
 
-# ============================================================
-# 4. MAIN COX MODEL AND PH ASSUMPTION
-# ============================================================
+#Main COX model and PH assumption
 
 all_model_rows = []
 ph_rows = []
@@ -197,11 +185,9 @@ if "AGE_PER_10" in surv.columns:
     )
     all_model_rows.extend(rows)
 
-# ============================================================
-# 5. FIND EXISTING ALTERNATIVE SIGNATURE-PANEL FILES
-# ============================================================
+#Find exisiting alternative signature-panel files
 
-print("\nSearching for existing signature contribution files...")
+print("\nSearching for existing signature contribution files")
 
 candidate_files = []
 for path in DIAG.rglob("*.csv"):
@@ -304,9 +290,7 @@ for name, d in panel_data.items():
     )
     panel_rows.extend(rows)
 
-# ============================================================
-# 6. MUTATION BURDEN SENSITIVITY
-# ============================================================
+#Mutational burden sensitivity
 
 print("\nChecking mutation-burden sensitivity...")
 
@@ -362,9 +346,7 @@ if burden_file.exists():
 else:
     print("Mutation-count matrix not found; burden sensitivity skipped.")
 
-# ============================================================
-# 7. SAVE RESULTS
-# ============================================================
+#Save
 
 pd.DataFrame(all_model_rows).to_csv(
     OUT / "main_cox_results.csv", index=False
@@ -378,9 +360,7 @@ pd.DataFrame(ph_rows).to_csv(
     OUT / "proportional_hazards_test.csv", index=False
 )
 
-print("\n" + "=" * 65)
-print("FINISHED")
-print("=" * 65)
+
 print("Output folder:", OUT)
 print("Files created when data are available:")
 print(" - analysis_cohort.csv")
@@ -388,8 +368,3 @@ print(" - main_cox_results.csv")
 print(" - panel_robustness_results.csv")
 print(" - mutation_burden_sensitivity.csv (if counts file found)")
 print(" - proportional_hazards_test.csv")
-print("\nIMPORTANT:")
-print("- Review printed panel filenames and labels.")
-print("- Confirm panel files really represent different fitted panels.")
-print("- Do not interpret non-significant p-values as proof of no effect.")
-print("- Signature-fit quality and BRCA variant classification still need review.")
