@@ -1,10 +1,8 @@
-
 from pathlib import Path
 import pandas as pd
 from lifelines import CoxPHFitter
 from lifelines.statistics import proportional_hazard_test
 
-# Project paths
 PROJECT = Path(__file__).resolve().parent.parent
 INPUT = (
     PROJECT
@@ -36,10 +34,10 @@ data = data[
     & data["OS_EVENT"].isin([0, 1])
 ].copy()
 
-# Express SBS3 in 10-percentage-point increments
+#Express SBS3 in 10-percentage-point increments
 data["SBS3_PER_10"] = data["SBS3_MAIN_PERCENT"] / 10
 
-# Fit Cox model
+#Fit Cox model
 cph = CoxPHFitter()
 cph.fit(
     data[["OS_MONTHS", "OS_EVENT", "SBS3_PER_10"]],
@@ -50,7 +48,7 @@ cph.fit(
 print("COX MODEL")
 cph.print_summary()
 
-# Test proportional hazards assumption
+#Test proportional hazards assumption
 ph_results = proportional_hazard_test(
     cph,
     data[["OS_MONTHS", "OS_EVENT", "SBS3_PER_10"]],
