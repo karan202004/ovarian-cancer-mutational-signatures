@@ -4,9 +4,6 @@ import numpy as np
 import pandas as pd
 from scipy.optimize import nnls
 
-# =========================================================
-# 1. PROJECT PATHS
-# =========================================================
 PROJECT = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
 )
@@ -28,9 +25,6 @@ CONTRIB_FILE = RESULTS / "signature_contributions_exploratory.csv"
 OUT = RESULTS / "all_diagnostics"
 OUT.mkdir(parents=True, exist_ok=True)
 
-# =========================================================
-# 2. LOAD EXISTING DATA
-# =========================================================
 counts = pd.read_csv(MATRIX_FILE, index_col=0)
 cosmic = pd.read_csv(COSMIC_FILE, sep="\t", index_col=0)
 
@@ -51,22 +45,17 @@ print(f"SBS96 channels: {counts.shape[1]}")
 print(f"Total mutations: {int(counts.to_numpy().sum()):,}")
 print(f"COSMIC signatures available: {cosmic.shape[1]}")
 
-# =========================================================
-# 3. MUTATION BURDEN
-# =========================================================
+# Mutational Burden
 burden = counts.sum(axis=1).rename("SBS_mutations")
 burden_summary = burden.describe(percentiles=[.10, .25, .50, .75, .90])
 burden_summary.to_csv(OUT / "mutation_burden_summary.csv")
 
-print("\n[1] MUTATION BURDEN")
+print("\n MUTATION BURDEN")
 print(burden_summary.round(2))
 print("Samples with <50 SBS:", int((burden < 50).sum()))
 print("Samples with <100 SBS:", int((burden < 100).sum()))
 print("Samples with <200 SBS:", int((burden < 200).sum()))
 
-# =========================================================
-# 4. EXISTING FIT QUALITY
-# =========================================================
 if FIT_FILE.exists():
     fit = pd.read_csv(FIT_FILE, index_col=0)
     fit.index = fit.index.astype(str)
@@ -86,11 +75,8 @@ else:
     fit = None
     print("\nExisting fit-quality file not found.")
 
-# =========================================================
-# 5. RE-FIT WITH ALTERNATIVE SIGNATURE PANELS
-# =========================================================
-# These are exploratory panels, not a claim that all listed
-# signatures are present in these tumours.
+
+#Re fit with alternative signature panel
 panels = {
     "current13": [
         "SBS1", "SBS2", "SBS3", "SBS5", "SBS8",
@@ -182,9 +168,8 @@ if len(panel_contributions) >= 2:
     print("\nRange of SBS3 estimates across panels:")
     print(comparison["panel_range_percentage_points"].describe().round(2))
 
-# =========================================================
-# 6. FIT QUALITY BY MUTATION BURDEN
-# =========================================================
+
+#Fit quality by mutation burden fit
 panel_results["burden_group"] = pd.cut(
     panel_results["SBS_mutations"],
     bins=[0, 50, 100, 200, 500, float("inf")],
@@ -206,9 +191,7 @@ by_burden.to_csv(OUT / "fit_quality_by_burden.csv", index=False)
 print("\n[4] FIT QUALITY BY MUTATION BURDEN")
 print(by_burden.to_string(index=False))
 
-# =========================================================
-# 7. CHECK CLINICAL FILES AND SURVIVAL DATA
-# =========================================================
+#Check clinical files and survival data check
 patient_file = RAW / "data_clinical_patient.txt"
 sample_file = RAW / "data_clinical_sample.txt"
 
@@ -255,9 +238,8 @@ if clinical_summary:
         OUT / "clinical_variable_availability.csv", index=False
     )
 
-# =========================================================
-# 8. SAMPLE MATCHING AND FINAL SUMMARY
-# =========================================================
+
+#Sample matching 
 if patient is not None:
     patient_id_col = next(
         (c for c in patient.columns
