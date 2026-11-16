@@ -277,7 +277,5 @@ pd.Series(summary, name="value").to_csv(
     OUT / "diagnostic_summary.csv"
 )
 
-print("\n" + "=" * 65)
 print("ALL DIAGNOSTICS FINISHED")
 print("Results folder:", OUT)
-print("=" * 65)
