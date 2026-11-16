@@ -1,13 +1,9 @@
-
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 from scipy.optimize import nnls
 
-# --------------------------------------------------
-# 1. Define project files
-# --------------------------------------------------
 PROJECT_DIR = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
 )
@@ -29,9 +25,6 @@ COSMIC_FILE = (
 RESULTS_DIR = PROJECT_DIR / "results"
 RESULTS_DIR.mkdir(exist_ok=True)
 
-# --------------------------------------------------
-# 2. Load SBS96 counts and COSMIC reference
-# --------------------------------------------------
 counts_df = pd.read_csv(MATRIX_FILE, index_col=0)
 cosmic_df = pd.read_csv(COSMIC_FILE, sep="\t", index_col=0)
 
@@ -54,9 +47,8 @@ if not np.allclose(counts_df.to_numpy(),
                    np.round(counts_df.to_numpy())):
     raise ValueError("Mutation counts are not integers.")
 
-# --------------------------------------------------
-# 3. Select a small exploratory signature panel
-# --------------------------------------------------
+
+#Select a small exploratory signature panel
 candidate_signatures = [
     "SBS1",
     "SBS2",
@@ -88,9 +80,8 @@ signature_matrix = cosmic_df[candidate_signatures].to_numpy(
     dtype=float
 )
 
-# --------------------------------------------------
-# 4. Fit each tumour using non-negative least squares
-# --------------------------------------------------
+
+#Fit each tumour using non-negative least squares
 contribution_rows = []
 quality_rows = []
 
@@ -148,9 +139,8 @@ for sample_id, row in counts_df.iterrows():
         "nnls_residual_norm": residual_norm,
     })
 
-# --------------------------------------------------
-# 5. Save results
-# --------------------------------------------------
+
+#Save results
 contributions_df = pd.DataFrame(contribution_rows)
 quality_df = pd.DataFrame(quality_rows).set_index("sample_id")
 
