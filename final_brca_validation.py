@@ -155,6 +155,4 @@ if not brca.empty:
 else:
     print("\nNo BRCA1/BRCA2 records were found.")
 
-print("\n" + "=" * 65)
 print(f"Output folder:\n{OUTPUT_DIR}")
-print("=" * 65)
