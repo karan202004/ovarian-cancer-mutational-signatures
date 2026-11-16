@@ -435,9 +435,7 @@ for csv_file in diagnostics_dir.rglob("*.csv"):
                 pass
 
 
-print("\n" + "=" * 65)
 print("Final figures and tables are generated")
-print("=" * 65)
 print(f"Figures saved in: {FIG_DIR}")
 print(f"Tables saved in:  {TABLE_DIR}")
 print("\nNo Markdown report was generated.")
