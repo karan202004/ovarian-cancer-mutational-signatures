@@ -1,7 +1,6 @@
 from pathlib import Path
 import pandas as pd
 
-# Project directory
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 OUTPUT_DIR = PROJECT_DIR / "results" / "final_brca_validation"
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
