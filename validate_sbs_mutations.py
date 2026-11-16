@@ -1,9 +1,6 @@
 from pathlib import Path
 import pandas as pd
 
-# --------------------------------------------------
-# 1. File paths
-# --------------------------------------------------
 
 DATA_DIR = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
@@ -19,9 +16,7 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 mutation_file = DATA_DIR / "data_mutations.txt"
 
-# --------------------------------------------------
-# 2. Load mutation data
-# --------------------------------------------------
+#Load mutation data
 
 mutations = pd.read_csv(
     mutation_file,
@@ -37,9 +32,7 @@ print("=" * 65)
 
 print("\nOriginal mutation records:", len(mutations))
 
-# --------------------------------------------------
-# 3. Keep single-nucleotide variants
-# --------------------------------------------------
+# Keep single-nucleotide variants
 
 sbs = mutations[
     mutations["Variant_Type"].astype(str).str.upper() == "SNP"
@@ -65,9 +58,7 @@ print("\nRequired-column check:")
 for column in required_columns:
     print(f"{column}: {'FOUND' if column in sbs.columns else 'MISSING'}")
 
-# --------------------------------------------------
-# 5. Check missing values
-# --------------------------------------------------
+#Check missing values
 
 print("\nMissing values in required fields:")
 
@@ -76,9 +67,7 @@ for column in required_columns:
         missing = sbs[column].isna().sum()
         print(f"{column}: {missing}")
 
-# --------------------------------------------------
-# 6. Check nucleotide alleles
-# --------------------------------------------------
+# Check nucleotide alleles
 
 valid_bases = {"A", "C", "G", "T"}
 
@@ -95,9 +84,8 @@ print("\nAllele validation:")
 print("Valid single-base allele records:", int(valid_alleles.sum()))
 print("Invalid or ambiguous allele records:", int((~valid_alleles).sum()))
 
-# --------------------------------------------------
-# 7. Check chromosome and coordinate values
-# --------------------------------------------------
+
+# Check chromosome and coordinate values
 
 sbs["Start_Position"] = pd.to_numeric(
     sbs["Start_Position"],
@@ -114,16 +102,12 @@ print("\nCoordinate validation:")
 print("Records with valid chromosome and position:",
       int(valid_coordinates.sum()))
 
-# --------------------------------------------------
 # 8. Check genome build
-# --------------------------------------------------
 
 print("\nGenome build:")
 print(sbs["NCBI_Build"].value_counts(dropna=False))
 
-# --------------------------------------------------
-# 9. Check duplicate mutation records
-# --------------------------------------------------
+#Check duplicate mutation records
 
 duplicate_columns = [
     "Tumor_Sample_Barcode",
@@ -142,9 +126,7 @@ print("\nDuplicate-coordinate check:")
 print("Records involved in potential duplicates:",
       int(duplicates.sum()))
 
-# --------------------------------------------------
-# 10. Summarise SNP counts by sample
-# --------------------------------------------------
+#Summarise SNP counts by sample
 
 counts = (
     sbs.groupby("Tumor_Sample_Barcode")
@@ -156,10 +138,8 @@ counts = (
 print("\nSample count summary:")
 print(counts["SNP_records"].describe())
 
-# --------------------------------------------------
-# 11. Save diagnostic results
-# --------------------------------------------------
 
+#save
 counts.to_csv(
     OUTPUT_DIR / "snp_counts_by_sample.csv",
     index=False
