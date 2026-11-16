@@ -237,9 +237,8 @@ cv_summary.to_csv(
     index=False,
 )
 
-print("\n" + "=" * 68)
+
 print("MODEL COMPARISON")
-print("=" * 68)
 print(comparison.round(4).to_string(index=False))
 
 print("\nLIKELIHOOD-RATIO TESTS")
