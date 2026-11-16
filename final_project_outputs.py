@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import re
 import warnings
@@ -12,9 +11,6 @@ from lifelines.statistics import logrank_test
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
-# ============================================================
-# 1. PROJECT PATHS
-# ============================================================
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,10 +40,7 @@ if not SURVIVAL_FILE.exists():
 df = pd.read_csv(SURVIVAL_FILE, low_memory=False)
 print(f"\nLoaded survival dataset: {df.shape[0]} rows, {df.shape[1]} columns")
 
-
-# ============================================================
-# 2. IDENTIFY COLUMNS
-# ============================================================
+#Identify columns
 
 def normalize(name):
     return re.sub(r"[^a-z0-9]", "", str(name).lower())
@@ -102,10 +95,7 @@ print(f"SBS3: {sbs3_col}")
 print(f"Age: {age_col}")
 print(f"Genomic instability: {aneuploidy_col}")
 
-
-# ============================================================
-# 3. CLEAN SURVIVAL DATA
-# ============================================================
+#Clean survival data
 
 def parse_event(value):
     if pd.isna(value):
@@ -164,10 +154,6 @@ print(f"Deaths: {int(work['event'].sum())}")
 print(f"Censored: {int((work['event'] == 0).sum())}")
 
 
-# ============================================================
-# 4. COHORT SUMMARY TABLE
-# ============================================================
-
 summary_rows = [
     ("Patients with usable survival data", len(work)),
     ("Deaths", int(work["event"].sum())),
@@ -188,10 +174,7 @@ pd.DataFrame(
     summary_rows, columns=["Measure", "Value"]
 ).to_csv(TABLE_DIR / "table1_cohort_summary.csv", index=False)
 
-
-# ============================================================
-# 5. KAPLAN-MEIER ANALYSIS
-# ============================================================
+#Kaplan-Meier Analysis
 
 km_data = work.dropna(subset=["SBS3"]).copy()
 cutoff = km_data["SBS3"].median()
@@ -252,9 +235,7 @@ pd.DataFrame([{
 }]).to_csv(TABLE_DIR / "table3_logrank_test.csv", index=False)
 
 
-# ============================================================
-# 6. COX MODELS: AGE, SBS3 AND GENOMIC INSTABILITY
-# ============================================================
+#COX Models: Age, SBS3, and Genomic Instability
 
 model_results = []
 
@@ -404,10 +385,7 @@ if model_results:
         plt.close(fig)
 
 
-# ============================================================
-# 7. SBS3 DISTRIBUTION AND BRCA TABLES
-# ============================================================
-
+#SBS3 distribution and BRAC table
 fig, ax = plt.subplots(figsize=(7, 5))
 ax.hist(work["SBS3"].dropna(), bins=30, edgecolor="black")
 ax.set_xlabel("SBS3 exposure (%)")
@@ -437,9 +415,7 @@ if brca_records_file.exists():
         )
 
 
-# ============================================================
-# 8. COPY EXISTING DIAGNOSTIC TABLES
-# ============================================================
+#Copy existing diagnositic table
 
 diagnostics_dir = PROJECT_DIR / "results" / "all_diagnostics"
 
@@ -459,12 +435,8 @@ for csv_file in diagnostics_dir.rglob("*.csv"):
                 pass
 
 
-# ============================================================
-# 9. FINISH
-# ============================================================
-
 print("\n" + "=" * 65)
-print("FINAL FIGURES AND TABLES GENERATED")
+print("Final figures and tables are generated")
 print("=" * 65)
 print(f"Figures saved in: {FIG_DIR}")
 print(f"Tables saved in:  {TABLE_DIR}")
