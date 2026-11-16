@@ -6,9 +6,7 @@ data_dir = Path(
     r"\data\raw\ov_tcga_pan_can_atlas_2018"
 )
 
-print("=" * 80)
-print("FILES IN THE TCGA-OV PAN-CANCER ATLAS DOWNLOAD")
-print("=" * 80)
+print("Files in the TCGA-OV PAN-CANCER ATLAS download")
 
 # Find files recursively, including those in nested folders
 files = sorted(path for path in data_dir.rglob("*") if path.is_file())
