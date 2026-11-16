@@ -1,12 +1,8 @@
-
 from pathlib import Path
 import re
 import pandas as pd
 import numpy as np
 
-# ============================================================
-# 1. PATHS
-# ============================================================
 PROJECT = Path(r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures")
 RESULTS = PROJECT / "results"
 DIAG = RESULTS / "all_diagnostics"
@@ -17,9 +13,7 @@ CLINICAL_FILE = DIAG / "matched_clinical_data.csv"
 SBS_MATRIX_FILE = RESULTS / "sbs96_counts_by_sample_cosmic_order.csv"
 BRCA_FILE = DIAG / "brca1_brca2_mutation_records.csv"
 
-# ============================================================
-# 2. HELPER: FIND SAMPLE ID AND SBS3 COLUMN
-# ============================================================
+#Find sample ID and SBS3 column
 def load_signature_file(path):
     df = pd.read_csv(path)
 
@@ -57,9 +51,7 @@ def load_signature_file(path):
     return df[["SAMPLE_ID", "SBS3_PERCENT"]].drop_duplicates("SAMPLE_ID")
 
 
-# ============================================================
-# 3. LOAD CLINICAL DATA AND SBS MUTATION BURDEN
-# ============================================================
+#Load clinical data and SBS mutation Burden 
 clinical = pd.read_csv(CLINICAL_FILE, low_memory=False)
 counts = pd.read_csv(SBS_MATRIX_FILE, index_col=0)
 
@@ -84,15 +76,10 @@ data = data.merge(
     main_sbs3, on="SAMPLE_ID", how="left", validate="one_to_one"
 )
 
-# ============================================================
-# 4. CHECK SURVIVAL CODING
-# ============================================================
 if "OS_STATUS" not in data.columns or "OS_MONTHS" not in data.columns:
     raise ValueError("OS_STATUS or OS_MONTHS is missing from clinical data.")
 
-print("\n" + "=" * 65)
 print("RAW OVERALL-SURVIVAL STATUS VALUES")
-print("=" * 65)
 print(data["OS_STATUS"].value_counts(dropna=False).to_string())
 
 print("\nOverall-survival time summary:")
@@ -121,9 +108,7 @@ data["OS_VALID"] = (
     & (data["OS_MONTHS"] >= 0)
 )
 
-print("\n" + "=" * 65)
 print("SURVIVAL DATA AVAILABILITY")
-print("=" * 65)
 print(f"Matched samples: {len(data)}")
 print(f"Usable OS records: {data['OS_VALID'].sum()}")
 print(f"Events/deaths among usable records: "
@@ -134,12 +119,7 @@ print(f"Age available: {data['AGE'].notna().sum()}")
 print(f"Missing age among usable OS records: "
       f"{data.loc[data['OS_VALID'], 'AGE'].isna().sum()}")
 
-# ============================================================
-# 5. BRCA1/2 ANNOTATION AUDIT — DO NOT ASSUME PATHOGENICITY
-# ============================================================
-print("\n" + "=" * 65)
 print("BRCA1/BRCA2 MUTATION ANNOTATION")
-print("=" * 65)
 
 if BRCA_FILE.exists():
     brca = pd.read_csv(BRCA_FILE, low_memory=False)
@@ -161,17 +141,13 @@ if BRCA_FILE.exists():
 else:
     print("BRCA mutation file not found; skipping annotation audit.")
 
-# ============================================================
-# 6. COMPARE SBS3 ESTIMATES ACROSS SIGNATURE PANELS
-# ============================================================
+#Compare SBS3 estimates across signature panels
 panel_files = {
     "core5": DIAG / "core5_signature_contributions.csv",
     "expanded8": DIAG / "expanded8_signature_contributions.csv",
     "current13": DIAG / "signature_contributions_exploratory.csv",
 }
 
-# File names vary between scripts, so search the diagnostics folder
-# for CSVs that contain an SBS3 column and are not fit-quality tables.
 found_panels = {}
 for path in DIAG.glob("*.csv"):
     if "contribution" not in path.name.lower():
@@ -226,9 +202,7 @@ if panel_cols:
 else:
     print("No SBS3 panel files were identified. Main estimate is retained.")
 
-# ============================================================
-# 7. SAVE DATA AND AUDIT REPORT
-# ============================================================
+#Save
 data.to_csv(OUT / "survival_analysis_dataset_preliminary.csv", index=False)
 
 audit = pd.DataFrame({
@@ -256,9 +230,7 @@ audit = pd.DataFrame({
 })
 audit.to_csv(OUT / "survival_data_audit.csv", index=False)
 
-print("\n" + "=" * 65)
 print("SAVED OUTPUTS")
-print("=" * 65)
 print(OUT / "survival_analysis_dataset_preliminary.csv")
 print(OUT / "survival_data_audit.csv")
 print(OUT / "BRCA1_BRCA2_annotation_audit.csv")
