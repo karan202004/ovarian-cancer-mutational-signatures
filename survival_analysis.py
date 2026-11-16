@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import warnings
 import pandas as pd
@@ -7,9 +6,6 @@ import numpy as np
 from lifelines import KaplanMeierFitter, CoxPHFitter
 from lifelines.statistics import logrank_test
 
-# ============================================================
-# 1. PATHS AND INPUTS
-# ============================================================
 PROJECT = Path(r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures")
 INPUT = (
     PROJECT / "results" / "all_diagnostics"
@@ -45,9 +41,8 @@ surv["OS_EVENT"] = surv["OS_EVENT"].astype(int)
 surv["SBS3_PER_10"] = surv["SBS3_MAIN_PERCENT"] / 10
 surv["AGE_PER_10"] = surv["AGE"] / 10
 
-print("=" * 65)
+
 print("SURVIVAL ANALYSIS")
-print("=" * 65)
 print(f"Patients included: {len(surv)}")
 print(f"Deaths: {(surv['OS_EVENT'] == 1).sum()}")
 print(f"Censored: {(surv['OS_EVENT'] == 0).sum()}")
@@ -56,10 +51,9 @@ print(f"Median follow-up time in dataset (months): "
 print(f"Median SBS3 contribution (%): "
       f"{surv['SBS3_MAIN_PERCENT'].median():.2f}")
 
-# ============================================================
-# 2. KAPLAN-MEIER: LOWER VS HIGHER SBS3
+
+#Kaplan-Meier: Lower VS Higher SBS3
 # Exploratory split at the cohort median
-# ============================================================
 cutoff = surv["SBS3_MAIN_PERCENT"].median()
 surv["SBS3_GROUP"] = np.where(
     surv["SBS3_MAIN_PERCENT"] >= cutoff,
@@ -119,10 +113,9 @@ plt.tight_layout()
 plt.savefig(OUT / "kaplan_meier_sbs3.png", dpi=300)
 plt.close()
 
-# ============================================================
-# 3. COX MODEL 1: SBS3 ALONE
+
+#COX MODEL 1: SBS3 Alone
 # HR is per 10-percentage-point increase in SBS3 contribution
-# ============================================================
 cox_rows = []
 
 def fit_cox(data, covariates, model_name):
@@ -179,10 +172,9 @@ model1 = fit_cox(
     "Model 1: SBS3 alone"
 )
 
-# ============================================================
-# 4. COX MODEL 2: SBS3 + AGE
+
+# COX Model 2: SBS3 + Age
 # Complete-case subset; report the smaller sample size
-# ============================================================
 age_data = surv[surv["AGE"].notna()].copy()
 
 model2 = fit_cox(
@@ -191,10 +183,9 @@ model2 = fit_cox(
     "Model 2: SBS3 + age"
 )
 
-# ============================================================
-# 5. PROVISIONAL BRCA MUTATION INDICATORS
-# These are exploratory indicators, NOT pathogenicity calls.
-# ============================================================
+
+#Provisional BRAC mutatinal indicators
+
 if BRCA_FILE.exists():
     brca = pd.read_csv(BRCA_FILE, low_memory=False)
 
@@ -252,9 +243,7 @@ if BRCA_FILE.exists():
     else:
         print("\nBRCA model skipped: sample barcode column not found.")
 
-# ============================================================
-# 6. SAVE RESULTS
-# ============================================================
+#Save
 if cox_rows:
     pd.DataFrame(cox_rows).to_csv(
         OUT / "cox_model_results.csv", index=False
@@ -262,17 +251,8 @@ if cox_rows:
 
 surv.to_csv(OUT / "survival_analysis_cohort.csv", index=False)
 
-print("\n" + "=" * 65)
 print("ANALYSIS FINISHED")
-print("=" * 65)
 print("Output folder:", OUT)
 print("Files created:")
 for file in sorted(OUT.glob("*")):
     print(" -", file.name)
-
-print("\nInterpret results cautiously:")
-print("- HR above 1 means higher hazard for higher values of the predictor.")
-print("- HR below 1 means lower hazard for higher values of the predictor.")
-print("- A p-value alone does not establish clinical usefulness.")
-print("- BRCA indicators here are exploratory, not validated pathogenic status.")
-print("- This script does not adjust for tumour stage, which is unavailable.")
