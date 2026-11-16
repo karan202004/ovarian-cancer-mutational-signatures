@@ -409,9 +409,7 @@ Change = {mean_cv_change:.3f}
     summary.strip(), encoding="utf-8"
 )
 
-print("\n" + "=" * 65)
 print("FINAL COMPARISON")
-print("=" * 65)
 print(comparison.to_string(index=False))
 print("\nLikelihood-ratio test p-value:", f"{lr_p:.5g}")
 print("AIC improvement:", f"{aic_improvement:.3f}")
