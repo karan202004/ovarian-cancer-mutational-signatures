@@ -121,6 +121,4 @@ if len(sbs_counts) > 0:
 
     print(bands.value_counts(sort=False))
 
-print("\n" + "=" * 65)
 print("CHECK COMPLETE")
-print("=" * 65)
