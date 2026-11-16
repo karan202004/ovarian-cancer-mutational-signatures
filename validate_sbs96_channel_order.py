@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import pandas as pd
 
@@ -23,7 +22,7 @@ tumour = pd.read_csv(TUMOUR_FILE, index_col=0)
 cosmic_channels = list(cosmic.index)
 tumour_channels = list(tumour.columns)
 
-print("\n========== CHANNEL VALIDATION ==========")
+print("\nCHANNEL VALIDATION")
 print("COSMIC channels:", len(cosmic_channels))
 print("Tumour channels:", len(tumour_channels))
 
