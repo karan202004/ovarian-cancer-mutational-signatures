@@ -1,8 +1,6 @@
-
 from pathlib import Path
 import pandas as pd
 
-# Project paths
 PROJECT_DIR = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
 )
@@ -25,7 +23,6 @@ if not REFERENCE_FILE.exists():
 # COSMIC files are tab-separated
 reference = pd.read_csv(REFERENCE_FILE, sep="\t", index_col=0)
 
-print("\n========== FILE INFORMATION ==========")
 print("Reference shape:", reference.shape)
 print("\nFirst 10 channel names:")
 print(reference.index[:10].tolist())
@@ -46,13 +43,13 @@ print("Negative values:", int((reference < 0).sum().sum()))
 if "SBS3" in reference.columns:
     print("SBS3 total:", reference["SBS3"].sum())
 
-# COSMIC signature probabilities should sum approximately to 1
+#COSMIC signature probabilities should sum approximately to 1
 column_sums = reference.sum(axis=0)
 
 print("\nSignature column-sum summary:")
 print(column_sums.describe())
 
-# Save a summary for the project
+#Save
 summary = pd.DataFrame({
     "Signature": reference.columns,
     "Column_Sum": column_sums.values,
