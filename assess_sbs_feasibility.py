@@ -1,12 +1,7 @@
-
 from pathlib import Path
 
 import pandas as pd
 import matplotlib.pyplot as p
-
-# --------------------------------------------------
-# 1. File paths
-# --------------------------------------------------
 
 PROJECT_DIR = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
@@ -21,11 +16,7 @@ OUTPUT_SUMMARY = RESULTS_DIR / "sbs_feasibility_summary.csv"
 OUTPUT_HISTOGRAM = RESULTS_DIR / "sbs_burden_distribution.png"
 
 
-# --------------------------------------------------
-# 2. Load the SBS96 matrix
-# --------------------------------------------------
-
-print("Loading SBS96 matrix...")
+print("Loading SBS96 matrix")
 
 matrix = pd.read_csv(
     MATRIX_FILE,
@@ -47,9 +38,7 @@ if (matrix < 0).any().any():
     raise ValueError("Matrix contains negative counts.")
 
 
-# --------------------------------------------------
-# 3. Calculate usable SBS count per sample
-# --------------------------------------------------
+#Calculate usable SBS count per sample
 
 counts = matrix.sum(axis=1).astype(int)
 
@@ -58,7 +47,7 @@ sample_results = pd.DataFrame({
     "Usable_SBS_Count": counts.values
 })
 
-# These are descriptive burden groups, not validated
+
 # minimum thresholds for SBS3 estimation.
 sample_results["Burden_Group"] = pd.cut(
     sample_results["Usable_SBS_Count"],
@@ -75,10 +64,7 @@ sample_results["Burden_Group"] = pd.cut(
 sample_results.to_csv(OUTPUT_COUNTS, index=False)
 
 
-# --------------------------------------------------
-# 4. Summarise the mutation burden distribution
-# --------------------------------------------------
-
+#Summarise the mutation burden distribution
 summary_stats = counts.describe(
     percentiles=[0.10, 0.25, 0.50, 0.75, 0.90]
 )
@@ -125,9 +111,7 @@ summary = pd.DataFrame({
 summary.to_csv(OUTPUT_SUMMARY, index=False)
 
 
-# --------------------------------------------------
-# 5. Count samples in each descriptive burden group
-# --------------------------------------------------
+#Count samples in each descriptive burden group
 
 group_counts = (
     sample_results["Burden_Group"]
@@ -140,9 +124,7 @@ print("\nMutation burden groups:")
 print(group_counts.to_string(index=False))
 
 
-# --------------------------------------------------
-# 6. Plot mutation burden distribution
-# --------------------------------------------------
+#Plot mutation burden distribution
 
 plt.figure(figsize=(9, 5))
 
@@ -164,12 +146,6 @@ plt.savefig(
 
 plt.show()
 
-
-# --------------------------------------------------
-# 7. Print results
-# --------------------------------------------------
-
-print("\n========== SBS FEASIBILITY SUMMARY ==========")
 print(summary.to_string(index=False))
 
 print("\nFiles saved:")
