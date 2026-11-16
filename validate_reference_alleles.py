@@ -109,7 +109,6 @@ for row in sbs[
         continue
 
     # MAF coordinates are 1-based.
-    # Python slicing is 0-based.
     observed = str(
         genome[chrom][position - 1:position]
     ).upper()
@@ -145,7 +144,6 @@ genome.close()
 # Report results
 checked = matches + mismatches
 
-print("\n========== VALIDATION RESULTS ==========")
 print(f"Matching reference alleles: {matches:,}")
 print(f"Mismatching reference alleles: {mismatches:,}")
 print(f"Unavailable/ambiguous positions: {unavailable:,}")
@@ -189,5 +187,3 @@ output_path = RESULTS_DIR / "reference_validation_summary.csv"
 summary.to_csv(output_path, index=False)
 
 print(f"\nSummary saved to: {output_path}")
-
-
