@@ -1,9 +1,6 @@
 from pathlib import Path
 import pandas as pd
 
-# ============================================================
-# 1. SET THE DATA DIRECTORY
-# ============================================================
 
 DATA_DIR = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
@@ -11,9 +8,6 @@ DATA_DIR = Path(
     r"\ov_tcga_pan_can_atlas_2018"
 )
 
-# ============================================================
-# 2. DEFINE THE FIVE FILES
-# ============================================================
 
 FILES = {
     "Mutations": DATA_DIR / "data_mutations.txt",
@@ -23,9 +17,6 @@ FILES = {
     "Sample clinical data": DATA_DIR / "data_clinical_sample.txt",
 }
 
-# ============================================================
-# 3. HELPER FUNCTION TO READ TABULAR FILES
-# ============================================================
 
 def read_tsv(file_path):
     """Read a tab-separated file, ignoring comment lines."""
@@ -38,14 +29,9 @@ def read_tsv(file_path):
         na_values=["NA", "N/A", "NaN", ""]
     )
 
+#Inspect file existence and size
 
-# ============================================================
-# 4. INSPECT FILE EXISTENCE AND SIZE
-# ============================================================
-
-print("=" * 85)
-print("TCGA-OV PAN-CANCER ATLAS: FILE INSPECTION")
-print("=" * 85)
+print("TCGA-OV PAN-CANCER ATLAS: File Inspection")
 
 print(f"\nData directory:\n{DATA_DIR}\n")
 
@@ -68,14 +54,9 @@ for name, file_path in FILES.items():
         print(f"File: {name}")
         print("Status: NOT FOUND")
 
+#Inspect mutation data
 
-# ============================================================
-# 5. INSPECT MUTATION DATA
-# ============================================================
-
-print("\n\n" + "=" * 85)
 print("1. SOMATIC MUTATION DATA")
-print("=" * 85)
 
 mutation_file = FILES["Mutations"]
 
@@ -138,14 +119,8 @@ if mutation_file.exists():
             mutations[sample_column].nunique()
         )
 
-
-# ============================================================
-# 6. INSPECT MUTATION METADATA
-# ============================================================
-
-print("\n\n" + "=" * 85)
+#Inspect mutation metadata
 print("2. MUTATION METADATA")
-print("=" * 85)
 
 metadata_file = FILES["Mutation metadata"]
 
@@ -154,13 +129,10 @@ if metadata_file.exists():
     print(metadata_file.read_text(encoding="utf-8", errors="replace"))
 
 
-# ============================================================
-# 7. INSPECT STUDY README
-# ============================================================
 
-print("\n\n" + "=" * 85)
+#Inspet study README
+
 print("3. STUDY README")
-print("=" * 85)
 
 readme_file = FILES["Study README"]
 
@@ -168,14 +140,9 @@ if readme_file.exists():
 
     print(readme_file.read_text(encoding="utf-8", errors="replace"))
 
+#Inspect patient clinical data
 
-# ============================================================
-# 8. INSPECT PATIENT CLINICAL DATA
-# ============================================================
-
-print("\n\n" + "=" * 85)
 print("4. PATIENT CLINICAL DATA")
-print("=" * 85)
 
 patient_file = FILES["Patient clinical data"]
 
@@ -241,14 +208,9 @@ if patient_file.exists():
                 f"({percent:.1f}%)"
             )
 
+# Inspect sample clinical data
 
-# ============================================================
-# 9. INSPECT SAMPLE CLINICAL DATA
-# ============================================================
-
-print("\n\n" + "=" * 85)
 print("5. SAMPLE CLINICAL DATA")
-print("=" * 85)
 
 sample_file = FILES["Sample clinical data"]
 
@@ -275,14 +237,7 @@ if sample_file.exists():
         ):
             print(f"  - {column}")
 
-
-# ============================================================
-# 10. FINAL SUMMARY
-# ============================================================
-
-print("\n\n" + "=" * 85)
-print("INSPECTION COMPLETE")
-print("=" * 85)
+print("Inspection completed")
 
 print(
     "\nNext step: verify mutation coordinates, reference/alternate "
