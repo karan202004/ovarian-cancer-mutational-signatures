@@ -1,4 +1,3 @@
-
 from pathlib import Path
 import re
 import warnings
@@ -11,10 +10,6 @@ from lifelines import CoxPHFitter
 from lifelines.utils import concordance_index
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
-
-# ============================================================
-# 1. PROJECT PATHS
-# ============================================================
 
 PROJECT = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
@@ -52,11 +47,6 @@ print(f"Input file: {INPUT_FILE}")
 print(f"Original rows: {len(df)}")
 print("\nAvailable columns:")
 print(df.columns.tolist())
-
-
-# ============================================================
-# 2. IDENTIFY THE REQUIRED COLUMNS
-# ============================================================
 
 def normalize(name):
     return re.sub(r"[^a-z0-9]", "", str(name).lower())
@@ -108,10 +98,7 @@ print("Survival status:", status_col)
 print("Age:", age_col)
 print("SBS3:", sbs3_col)
 
-
-# ============================================================
-# 3. PREPARE ONE COMMON COHORT FOR BOTH MODELS
-# ============================================================
+#Prepare one common cohort for both models
 
 def convert_event(value):
     """Convert TCGA survival status into 1=death, 0=censored."""
@@ -167,9 +154,7 @@ print(f"Median age: {analysis['AGE_PER_10'].median() * 10:.1f} years")
 print(f"Median SBS3: {analysis['SBS3_PER_10'].median() * 10:.2f}%")
 
 
-# ============================================================
-# 4. FIT THE TWO COX MODELS
-# ============================================================
+#Fit the two COX models
 
 age_data = analysis[["OS_MONTHS", "EVENT", "AGE_PER_10"]]
 full_data = analysis[
@@ -196,11 +181,7 @@ print(age_model.summary)
 print("\nMODEL 2: AGE + SBS3")
 print(full_model.summary)
 
-
-# ============================================================
 # 5. FORMAL LIKELIHOOD-RATIO TEST
-# ============================================================
-
 # The models are nested and use the same patients.
 lr_stat = 2 * (full_model.log_likelihood_ - age_model.log_likelihood_)
 lr_stat = max(0.0, float(lr_stat))
@@ -213,17 +194,13 @@ sbs3_ci_low = float(sbs3_row["exp(coef) lower 95%"])
 sbs3_ci_high = float(sbs3_row["exp(coef) upper 95%"])
 sbs3_p = float(sbs3_row["p"])
 
-# AIC: lower values indicate better relative fit.
 age_aic = float(age_model.AIC_partial_)
 full_aic = float(full_model.AIC_partial_)
 
 # Positive value means the age + SBS3 model has lower AIC.
 aic_improvement = age_aic - full_aic
 
-
-# ============================================================
-# 6. IN-SAMPLE CONCORDANCE (DESCRIPTIVE)
-# ============================================================
+#IN-SAMPLE CONCORDANCE (DESCRIPTIVE) In Sample Concordance (Descriptive)
 
 age_risk = age_model.predict_partial_hazard(age_data).to_numpy().ravel()
 full_risk = full_model.predict_partial_hazard(full_data).to_numpy().ravel()
@@ -238,13 +215,8 @@ c_full = concordance_index(
     analysis["OS_MONTHS"], -full_risk, analysis["EVENT"]
 )
 
-
-# ============================================================
-# 7. FIVE-FOLD CROSS-VALIDATED C-INDEX
-# ============================================================
-
+#Five-Fold cross validation C-Index
 # Evaluate both models on held-out patients.
-# Folds are stratified by death/censoring status.
 
 if analysis["EVENT"].value_counts().min() < 5:
     raise ValueError(
@@ -316,10 +288,8 @@ mean_cv_full = cv_results["age_plus_SBS3_c_index"].mean()
 mean_cv_change = cv_results["change_in_c_index"].mean()
 
 
-# ============================================================
-# 8. SAVE FINAL COMPARISON TABLE
-# ============================================================
 
+#Save
 comparison = pd.DataFrame([
     {
         "model": "Age only",
@@ -370,10 +340,6 @@ details.to_csv(
 )
 
 
-# ============================================================
-# 9. WRITE A PLAIN-LANGUAGE SUMMARY
-# ============================================================
-
 if lr_p < 0.05:
     fit_result = (
         "Adding SBS3 significantly improved model fit by the "
@@ -409,7 +375,7 @@ else:
     )
 
 summary = f"""
-SBS3 BEYOND AGE: MODEL COMPARISON
+SBS3 Beyond Age: Model Comparison
 
 Patients included: {n}
 Deaths: {deaths}
@@ -437,12 +403,6 @@ Age + SBS3 = {mean_cv_full:.3f}
 Change = {mean_cv_change:.3f}
 {cv_result}
 
-INTERPRETATION CAUTION:
-Cross-validated C-index estimates can vary with the sample and folds.
-This analysis evaluates incremental prognostic information within
-this TCGA cohort; it does not establish clinical usefulness or
-independent external validation. The models use complete cases
-with both age and SBS3 available.
 """
 
 (OUTPUT_DIR / "interpretation.txt").write_text(
