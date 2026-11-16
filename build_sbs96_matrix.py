@@ -1,14 +1,9 @@
-
 from pathlib import Path
 from collections import Counter
 
 import pandas as pd
 from pyfaidx import Fasta
 
-
-# --------------------------------------------------
-# 1. File paths
-# --------------------------------------------------
 
 PROJECT_DIR = Path(
     r"C:\Users\karan\PycharmProjects\Ovarian_Mutational_Signatures"
@@ -35,10 +30,6 @@ RESULTS_DIR = PROJECT_DIR / "results"
 RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
-# --------------------------------------------------
-# 2. Define the 96 mutation categories
-# --------------------------------------------------
-
 BASES = ["A", "C", "G", "T"]
 
 SUBSTITUTIONS = [
@@ -56,10 +47,7 @@ CHANNELS = [
 assert len(CHANNELS) == 96
 print(f"Defined mutation categories: {len(CHANNELS)}")
 
-
-# --------------------------------------------------
-# 3. Load mutation data
-# --------------------------------------------------
+#Load mutation data
 
 print("\nLoading mutation data...")
 
@@ -107,11 +95,8 @@ sbs["Start_Position"] = sbs["Start_Position"].astype(int)
 print(f"Valid SNP records selected: {len(sbs):,}")
 
 
-# --------------------------------------------------
-# 4. Open the existing GRCh37 reference
-# --------------------------------------------------
-
-print("\nOpening GRCh37 reference genome...")
+#Open the existing GRCh37 reference
+print("\nOpening GRCh37 reference genome")
 
 genome = Fasta(
     str(REFERENCE_FILE),
@@ -129,10 +114,7 @@ unavailable_contexts = 0
 mismatch_examples = []
 unavailable_examples = []
 
-
-# --------------------------------------------------
-# 5. Retrieve context and count mutations
-# --------------------------------------------------
+#Retrieve context and count mutations
 
 print("\nBuilding SBS96 matrix...")
 
@@ -228,10 +210,7 @@ for row in sbs[
 
 genome.close()
 
-
-# --------------------------------------------------
-# 6. Save the sample-by-96 matrix
-# --------------------------------------------------
+#Save the sample-by-96 matrix
 
 print("\nSaving SBS96 matrix...")
 
@@ -258,10 +237,7 @@ totals = pd.DataFrame({
 totals_path = RESULTS_DIR / "sbs_counts_by_sample.csv"
 totals.to_csv(totals_path, index=False)
 
-
-# --------------------------------------------------
-# 7. Validate matrix totals
-# --------------------------------------------------
+#Validate matrix totals
 
 matrix_total = int(matrix.to_numpy().sum())
 
@@ -293,12 +269,6 @@ summary = pd.DataFrame({
 summary_path = RESULTS_DIR / "sbs96_validation_summary.csv"
 summary.to_csv(summary_path, index=False)
 
-
-# --------------------------------------------------
-# 8. Print results
-# --------------------------------------------------
-
-print("\n========== SBS96 RESULTS ==========")
 print(f"Samples in matrix: {len(matrix):,}")
 print(f"Mutation categories: {matrix.shape[1]}")
 print(f"Mutations processed: {processed:,}")
